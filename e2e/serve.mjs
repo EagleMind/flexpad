@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Serve dist/ like Cloudflare Pages: the rules in dist/_headers, and index.html for unknown paths.
+// Serve dist/ like Cloudflare Workers static assets: the rules in dist/_headers, and index.html for unknown paths.
 // Usage: node e2e/serve.mjs <port>      (also exported for tests that stop and restart the server)
 import { createReadStream, existsSync, readFileSync, statSync } from "node:fs";
 import { createServer } from "node:http";

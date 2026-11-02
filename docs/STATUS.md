@@ -7,10 +7,12 @@
 
 - [ ] **Decide on a contributor agreement** before accepting outside pull requests (needed to keep dual licensing possible; see ADR-0006).
 - [ ] **Turn on private vulnerability reporting:** GitHub → flexpad → Settings → Security → Private vulnerability reporting.
-- [ ] **Connect Cloudflare Pages:** Cloudflare dashboard → Workers & Pages → Create → Pages → Connect to Git → `EagleMind/flexpad`.
-  - Build command: `pnpm build`. Output directory: `dist`. Environment variable `NODE_VERSION` = `22.18.0`.
-  - Every branch then gets a preview URL; `main` is production.
-- [ ] **Test on real devices** using the `m4-reader` preview URL:
+- [ ] **Deploy on Cloudflare Workers** (ADR-0007). Connect FlexPad, not the flexova SDK repository:
+  - Workers & Pages → Create → Import a repository → `EagleMind/flexpad`, with name `flexpad`.
+  - Build command: `pnpm build`. Deploy command: `npx wrangler deploy`. Non-production branch deploy command: `npx wrangler versions upload`.
+  - Settings → Build → Branch control: production branch `main`; turn on **Builds for non-production branches** (that's how `m4-reader` gets a preview URL before it merges).
+  - Delete the earlier Worker connected to `EagleMind/flexova`.
+- [ ] **Test on real devices** using the `m4-reader` preview URL (shown in the Worker's build log and Deployments tab):
   - iPhone (Safari) and Android (Chrome): open the sample, use Contents, Search, text size and theme;
   - install to the home screen, open a `.flexova` file from Files/Downloads;
   - switch to airplane mode, reopen FlexPad, open a document from the library;

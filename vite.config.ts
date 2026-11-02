@@ -34,7 +34,7 @@ const { version } = JSON.parse(readFileSync(new URL("package.json", import.meta.
   version: string;
 };
 
-/** The commit being built, for the AGPL source offer: Cloudflare Pages, then GitHub Actions, then git. */
+/** The commit being built, for the AGPL source offer: from CI variables, else git (Workers Builds clones the repo). */
 function commit(): string {
   const fromEnv = process.env.CF_PAGES_COMMIT_SHA ?? process.env.GITHUB_SHA;
   if (fromEnv) return fromEnv;

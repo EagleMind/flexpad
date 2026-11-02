@@ -21,7 +21,8 @@
     "check": "pnpm lint && pnpm format:check && pnpm typecheck && pnpm test && pnpm build",
     "e2e": "playwright test",
     "icons": "node scripts/icons.mjs",
-    "vendor": "node scripts/update-flexova.mjs"
+    "vendor": "node scripts/update-flexova.mjs",
+    "deploy:check": "pnpm build && wrangler deploy --dry-run"
   },
   "dependencies": {
     "@flexova/core": "file:vendor/flexova-core-0.0.0.tgz",
@@ -49,6 +50,7 @@
     "vite": "^8.3.5",
     "vite-plugin-pwa": "^2.0.0",
     "vitest": "^5.0.5",
-    "workbox-window": "^7.4.1"
+    "workbox-window": "^7.4.1",
+    "wrangler": "4.156.1"
   }
 }

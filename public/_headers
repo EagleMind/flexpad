@@ -1,4 +1,4 @@
-# Cloudflare Pages response headers (e2e/serve.mjs applies the same rules in tests).
+# Response headers for Cloudflare Workers static assets (e2e/serve.mjs applies the same rules in tests).
 /*
   Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data:; media-src 'self' blob: data:; font-src 'self'; connect-src 'self'; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'
   X-Content-Type-Options: nosniff
