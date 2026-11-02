@@ -1,0 +1,10 @@
+{
+  "$comment": "Written by scripts/update-flexova.mjs. Replace with npm versions once @flexova 0.1.0 is published.",
+  "repository": "https://github.com/EagleMind/flexova",
+  "branch": "m4-reader-hooks",
+  "commit": "2dd61274e043dedabac44bbc358af256346cfb04",
+  "packages": [
+    "flexova-core-0.0.0.tgz",
+    "flexova-viewer-0.0.0.tgz"
+  ]
+}
