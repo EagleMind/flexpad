@@ -2,7 +2,7 @@
 // Build FlexPad's sample and test documents with the flexova CLI from a flexova checkout.
 // Usage: node scripts/fixtures.mjs [path-to-flexova]   (default: $FLEXOVA_DIR or ../flexova)
 import { execFileSync } from "node:child_process";
-import { copyFileSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { copyFileSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 
@@ -12,6 +12,21 @@ const cli = (...args) =>
   execFileSync("node", [join(flexova, "packages/cli/dist/cli.js"), ...args], { stdio: "inherit" });
 const fixtures = join(root, "e2e", "fixtures");
 const modified = ["--modified", "2026-11-02T00:00:00Z"];
+const CONFORMANCE = [
+  "minimal",
+  "block-elements",
+  "inline-elements",
+  "images",
+  "mathml",
+  "links",
+  "audio",
+  "right-to-left",
+  "tokens-full",
+  "tables-complex",
+  "nested-lists",
+  "comments-cdata-pi",
+  "warning-heading-skip",
+];
 
 cli(
   "build",
@@ -78,5 +93,13 @@ copyFileSync(
   join(flexova, "conformance/invalid/image-without-alt.flexova"),
   join(fixtures, "invalid.flexova"),
 );
+// Valid conformance packages that exercise every structure the editor must round-trip.
+mkdirSync(join(fixtures, "conformance"), { recursive: true });
+for (const name of CONFORMANCE) {
+  copyFileSync(
+    join(flexova, "conformance/valid", `${name}.flexova`),
+    join(fixtures, "conformance", `${name}.flexova`),
+  );
+}
 writeFileSync(join(fixtures, "not-flexova.txt"), "This is not a Flexova document.\n");
 console.log("fixtures written");

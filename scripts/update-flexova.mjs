@@ -8,11 +8,26 @@ import { join, resolve } from "node:path";
 const root = resolve(import.meta.dirname, "..");
 const flexova = resolve(process.argv[2] ?? process.env.FLEXOVA_DIR ?? join(root, "..", "flexova"));
 const vendor = join(root, "vendor");
-const packages = ["core", "viewer"];
+const packages = ["core", "viewer", "html", "import"];
 const run = (cmd, args, cwd) => execFileSync(cmd, args, { cwd, encoding: "utf8" }).trim();
 
 for (const f of readdirSync(vendor)) if (f.endsWith(".tgz")) rmSync(join(vendor, f));
-run("pnpm", ["--filter", "@flexova/core", "--filter", "@flexova/viewer", "run", "build"], flexova);
+run(
+  "pnpm",
+  [
+    "--filter",
+    "@flexova/core",
+    "--filter",
+    "@flexova/viewer",
+    "--filter",
+    "@flexova/html",
+    "--filter",
+    "@flexova/import",
+    "run",
+    "build",
+  ],
+  flexova,
+);
 const files = packages.map((p) =>
   run("pnpm", ["pack", "--pack-destination", vendor], join(flexova, "packages", p))
     .split("\n")
