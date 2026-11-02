@@ -33,7 +33,8 @@
   - 10 unit tests;
   - 28 browser tests on Chromium: opening, every tool, signatures, bad documents, library and position persistence, offline with the server stopped, axe (0 violations) on every screen and dialog, 4 widths × 2 themes with no horizontal scrolling, installability, the AGPL source link;
   - Lighthouse (local run): performance 100, accessibility 100, best practices 100.
-- [ ] Firefox and WebKit green in CI (the build session only has Chromium)
+- [x] Chromium, Firefox and WebKit green in CI, along with Lighthouse. Two fixes were needed: library documents are now stored as ArrayBuffers (WebKit refuses Blobs in IndexedDB in private browsing), and a jump's target is held in place while chapters render (no scroll anchoring for this in WebKit or Firefox).
+- [ ] Known flake: in Firefox, one test per run can time out on its first page load and pass on retry (CI retries once). The cause isn't identified yet; the Playwright trace is in the run's `playwright-report-firefox` artifact.
 - [ ] Real-device check (owner)
 
 ### M5: Editor (L)
