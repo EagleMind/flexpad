@@ -4,7 +4,7 @@ import { database, type LibraryRecord } from "../db";
 
 export const LIMITS = { count: 20, bytes: 200 * 1024 * 1024 };
 
-export type LibraryEntry = Omit<LibraryRecord, "blob">;
+export type LibraryEntry = Omit<LibraryRecord, "data">;
 
 /** Which entries to evict, newest first kept, so at most `limits` remain. Pure, for testing. */
 export function toEvict(entries: LibraryEntry[], limits = LIMITS): string[] {
@@ -40,7 +40,11 @@ export async function listLibrary(): Promise<LibraryEntry[]> {
 export async function remember(entry: LibraryEntry, bytes: Uint8Array): Promise<boolean> {
   try {
     const d = await database();
-    await d.put("library", { ...entry, blob: new Blob([bytes as Uint8Array<ArrayBuffer>]) });
+    const data = bytes.buffer.slice(
+      bytes.byteOffset,
+      bytes.byteOffset + bytes.byteLength,
+    ) as ArrayBuffer;
+    await d.put("library", { ...entry, data });
     for (const hash of toEvict(await listLibrary())) await d.delete("library", hash);
     return true;
   } catch {
@@ -54,10 +58,10 @@ export async function loadFromLibrary(
   const d = await database();
   const record = await d.get("library", hash);
   if (!record) return null;
-  const { blob, ...entry } = record;
+  const { data, ...entry } = record;
   const updated = { ...entry, opened: Date.now() };
-  await d.put("library", { ...updated, blob });
-  return { entry: updated, bytes: new Uint8Array(await blob.arrayBuffer()) };
+  await d.put("library", { ...updated, data });
+  return { entry: updated, bytes: new Uint8Array(data) };
 }
 
 export async function forget(hash: string): Promise<void> {

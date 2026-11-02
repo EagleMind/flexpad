@@ -1,4 +1,4 @@
-// FlexPad's IndexedDB: the library (document bytes as Blobs), reading positions, trusted public keys,
+// FlexPad's IndexedDB: the library (document bytes), reading positions, trusted public keys,
 // and a per-install random salt. Nothing here leaves the device.
 import { openDB, type DBSchema, type IDBPDatabase } from "idb";
 
@@ -9,7 +9,8 @@ export interface LibraryRecord {
   identifier: string | null;
   size: number;
   opened: number;
-  blob: Blob;
+  /** The document's bytes. An ArrayBuffer, not a Blob: WebKit refuses Blobs in IndexedDB in private browsing. */
+  data: ArrayBuffer;
 }
 
 export interface PositionRecord {

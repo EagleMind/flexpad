@@ -49,9 +49,36 @@ export function Reader({ doc, settings, onSettings, onClose, onOpenSettings, ann
   const toolbarHeight = () => (toolbar.current?.getBoundingClientRect().height ?? 0) + 8;
 
   /** Scroll so `el` (inside the viewer's shadow root) sits just below the sticky toolbar. */
-  const scrollToElement = useCallback((el: Element, block: ScrollLogicalPosition = "start") => {
+  const scrollToElement = useCallback((el: Element, block: "start" | "center" = "start") => {
+    const target = () => {
+      const height = el.getBoundingClientRect().height;
+      const top = toolbarHeight();
+      return block === "center" && height < window.innerHeight - top
+        ? (window.innerHeight + top - height) / 2
+        : top;
+    };
     el.scrollIntoView({ block });
-    if (block === "start") window.scrollBy(0, -toolbarHeight());
+    window.scrollBy(0, el.getBoundingClientRect().top - target());
+    // Chapters render on demand (content-visibility) and change height as they appear. Chromium's scroll
+    // anchoring hides that; WebKit has none and Firefox's skips this case, so the target would drift.
+    // Hold it in place for a few frames, and stop as soon as the reader scrolls.
+    let frames = 0;
+    let stable = 0;
+    let cancelled = false;
+    const cancel = () => (cancelled = true);
+    const inputs = ["wheel", "touchstart", "keydown", "pointerdown"] as const;
+    for (const type of inputs) window.addEventListener(type, cancel, { once: true, passive: true });
+    const step = () => {
+      if (cancelled) return;
+      const off = el.getBoundingClientRect().top - target();
+      if (Math.abs(off) > 2) {
+        window.scrollBy(0, off);
+        stable = 0;
+      } else stable++;
+      if (++frames < 60 && stable < 5) requestAnimationFrame(step);
+      else for (const type of inputs) window.removeEventListener(type, cancel);
+    };
+    requestAnimationFrame(step);
   }, []);
 
   // Load the document, then restore the reading position.
