@@ -9,9 +9,11 @@ interface Props {
   onClose: () => void;
   children: ReactNode;
   className?: string;
+  /** Whether closing returns focus to what opened the dialog (default yes). */
+  restoreFocus?: () => boolean;
 }
 
-export function Dialog({ open, title, onClose, children, className }: Props) {
+export function Dialog({ open, title, onClose, children, className, restoreFocus }: Props) {
   const ref = useRef<HTMLDialogElement>(null);
   const titleId = useId();
   const returnTo = useRef<Element | null>(null);
@@ -31,12 +33,13 @@ export function Dialog({ open, title, onClose, children, className }: Props) {
     const dialog = ref.current;
     if (!dialog) return;
     const onDialogClose = () => {
+      const restore = restoreFocus?.() ?? true;
       onClose();
-      if (returnTo.current instanceof HTMLElement) returnTo.current.focus();
+      if (restore && returnTo.current instanceof HTMLElement) returnTo.current.focus();
     };
     dialog.addEventListener("close", onDialogClose);
     return () => dialog.removeEventListener("close", onDialogClose);
-  }, [onClose]);
+  }, [onClose, restoreFocus]);
 
   return (
     <dialog

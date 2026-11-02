@@ -93,6 +93,7 @@ copyFileSync(
   join(flexova, "conformance/invalid/image-without-alt.flexova"),
   join(fixtures, "invalid.flexova"),
 );
+copyFileSync(join(flexova, "samples/docx/field-guide.docx"), join(fixtures, "field-guide.docx"));
 // Valid conformance packages that exercise every structure the editor must round-trip.
 mkdirSync(join(fixtures, "conformance"), { recursive: true });
 for (const name of CONFORMANCE) {

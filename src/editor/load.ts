@@ -189,9 +189,10 @@ export function blankDocument(language: string, title: string): Editable {
   const chapter = T.chapter.create({ file: "01.xhtml" }, [heading, T.paragraph.create()]);
   return {
     doc: T.doc.create(null, [chapter]),
+    // No explicit title yet: the document is titled by its first heading until the author sets one.
     meta: {
       identifier: `urn:uuid:${crypto.randomUUID()}`,
-      title,
+      title: "",
       language,
       authors: [],
       tokens: undefined,

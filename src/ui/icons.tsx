@@ -24,4 +24,5 @@ export const SettingsIcon = icon(
   <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm8-3 2-1-2-4-2 1-2-1V4h-4v3l-2 1-2-1-2 4 2 1v2l-2 1 2 4 2-1 2 1v3h4v-3l2-1 2 1 2-4-2-1z" />,
 );
 export const CloseIcon = icon(<path d="M6 6l12 12M18 6 6 18" />);
+export const EditIcon = icon(<path d="M4 20h4L19 9l-4-4L4 16zM14 6l4 4" />);
 export const OpenIcon = icon(<path d="M4 20V4h9l5 5v11zM13 4v5h5" />);

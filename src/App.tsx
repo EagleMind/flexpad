@@ -1,5 +1,5 @@
 // FlexPad: the library (home) and the reader, plus every way to open a document.
-import { useCallback, useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { database } from "./db";
 import { prepare, type OpenDoc } from "./document";
 import { Home } from "./library/Home";
@@ -10,6 +10,11 @@ import { Reader } from "./reader/Reader";
 import { loadSettings, saveSettings, type Settings } from "./settings/settings";
 import { SettingsDialog } from "./settings/SettingsDialog";
 import { t } from "./strings";
+import type { EditSession } from "./editor/Editor";
+
+// The editor and importers load only when needed, so reading stays light.
+const Editor = lazy(() => import("./editor/Editor").then((m) => ({ default: m.Editor })));
+const PrintView = lazy(() => import("./editor/PrintView").then((m) => ({ default: m.PrintView })));
 
 interface LaunchParams {
   files: { getFile(): Promise<File> }[];
@@ -32,6 +37,8 @@ export function App() {
   const [problem, setProblem] = useState<string | null>(null);
   const [dragging, setDragging] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [editing, setEditing] = useState<EditSession | null>(null);
+  const [printing, setPrinting] = useState<Uint8Array | null>(null);
   const [message, setMessage] = useState("");
   const fileInput = useRef<HTMLInputElement>(null);
 
@@ -165,6 +172,57 @@ export function App() {
     return () => window.removeEventListener("popstate", onPop);
   }, []);
 
+  const startEditing = async (load: () => Promise<EditSession>) => {
+    setBusy(true);
+    setProblem(null);
+    try {
+      setEditing(await load());
+    } catch {
+      setProblem(t.editor.importFailed);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const newDocument = () =>
+    startEditing(async () => {
+      const { blankDocument } = await import("./editor/load");
+      const lang = /^[A-Za-z]{2,8}(-[A-Za-z0-9]{1,8})*$/.test(navigator.language)
+        ? navigator.language
+        : "en";
+      return {
+        editable: blankDocument(lang, t.editor.untitled),
+        name: "document.flexova",
+        handle: null,
+      };
+    });
+
+  const importDocument = (file: File) =>
+    startEditing(async () => {
+      const { importDocx, importMarkdown } = await import("./editor/importers");
+      const imported = /\.docx$/i.test(file.name)
+        ? await importDocx(file)
+        : await importMarkdown(file);
+      return {
+        editable: imported,
+        name: file.name.replace(/\.[^.]*$/, ".flexova"),
+        handle: null,
+        warnings: imported.warnings,
+      };
+    });
+
+  const editDocument = (current: OpenDoc) => {
+    if (!current.info) {
+      announce(t.editor.invalidForEdit);
+      setProblem(t.editor.invalidForEdit);
+      return;
+    }
+    void startEditing(async () => {
+      const { loadForEditing } = await import("./editor/load");
+      return { editable: await loadForEditing(current.bytes), name: current.name, handle: null };
+    });
+  };
+
   const closeDoc = () => {
     if (history.state?.reading === true) history.back();
     else setDoc(null);
@@ -183,7 +241,20 @@ export function App() {
           if (file) openFile(file);
         }}
       />
-      {doc ? (
+      {editing ? (
+        <Suspense fallback={<p className="loading">{t.loading}</p>}>
+          <Editor
+            session={editing}
+            announce={announce}
+            onPrint={(bytes) => setPrinting(bytes)}
+            onClose={(saved) => {
+              setEditing(null);
+              refreshLibrary();
+              if (saved) void show(async () => saved);
+            }}
+          />
+        </Suspense>
+      ) : doc ? (
         <Reader
           key={doc.hash}
           doc={doc}
@@ -191,6 +262,7 @@ export function App() {
           onSettings={setSettings}
           onClose={closeDoc}
           onOpenSettings={() => setSettingsOpen(true)}
+          onEdit={() => editDocument(doc)}
           announce={announce}
         />
       ) : (
@@ -199,6 +271,8 @@ export function App() {
           storageWorks={storageWorks}
           onOpen={() => void pick()}
           onSample={() => void openUrl(SAMPLE)}
+          onNew={() => void newDocument()}
+          onImport={(file) => void importDocument(file)}
           onOpenEntry={(hash) =>
             void show(async () => {
               const found = await loadFromLibrary(hash);
@@ -215,7 +289,7 @@ export function App() {
           {t.loading}
         </p>
       )}
-      {problem && !doc && (
+      {problem && (!doc || editing) && (
         <p className="toast toast-error app-chrome" role="alert">
           {problem}
         </p>
@@ -233,6 +307,11 @@ export function App() {
         onLibraryCleared={refreshLibrary}
         announce={announce}
       />
+      {printing && (
+        <Suspense fallback={null}>
+          <PrintView bytes={printing} onDone={() => setPrinting(null)} />
+        </Suspense>
+      )}
       <UpdateToast />
       <p className="visually-hidden" role="status" aria-live="polite">
         {message}

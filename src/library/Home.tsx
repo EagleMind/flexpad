@@ -7,6 +7,8 @@ interface Props {
   storageWorks: boolean;
   onOpen: () => void;
   onSample: () => void;
+  onNew: () => void;
+  onImport: (file: File) => void;
   onOpenEntry: (hash: string) => void;
   onRemove: (hash: string) => void;
   onOpenSettings: () => void;
@@ -22,6 +24,8 @@ export function Home({
   storageWorks,
   onOpen,
   onSample,
+  onNew,
+  onImport,
   onOpenEntry,
   onRemove,
   onOpenSettings,
@@ -57,6 +61,23 @@ export function Home({
             <button type="button" className="link-button" onClick={onSample}>
               {t.trySample}
             </button>
+          </p>
+          <p className="create">
+            <button type="button" className="secondary" onClick={onNew}>
+              {t.editor.newDocument}
+            </button>
+            <label className="secondary file-button">
+              {t.editor.importDoc}
+              <input
+                type="file"
+                accept=".md,.markdown,text/markdown,.docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  e.target.value = "";
+                  if (file) onImport(file);
+                }}
+              />
+            </label>
           </p>
         </section>
         <section className="library" aria-labelledby="library-title">

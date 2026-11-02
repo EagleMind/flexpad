@@ -277,7 +277,28 @@ const nodes: Record<string, NodeSpec> = {
     toDOM: (node) => [`h${node.attrs.level}`, presentAttrs(node, "h1"), 0],
   },
   blockquote: element("blockquote", "block+", "block figure_item", { defining: true }),
-  callout: element("aside", "block+", "block", { defining: true }),
+  callout: element("aside", "block+", "block", {
+    defining: true,
+    // Imported Word callouts arrive as <aside class="warning">; ours carry data-flexova-variant.
+    parseDOM: [
+      {
+        tag: "aside",
+        getAttrs: (dom) => {
+          const el = dom as HTMLElement;
+          const attrs = readAttrs(el, "aside");
+          const fromClass = ["note", "tip", "important", "warning", "caution"].find((v) =>
+            el.classList.contains(v),
+          );
+          const variant = attrs["data-flexova-variant"] ?? fromClass ?? null;
+          return {
+            ...attrs,
+            "data-flexova-variant": variant,
+            role: variant || attrs.role ? "note" : null,
+          };
+        },
+      },
+    ],
+  }),
   section: element("section", "block+", "block", { defining: true }),
   bullet_list: element("ul", "list_item+", "block"),
   ordered_list: element("ol", "list_item+", "block"),
