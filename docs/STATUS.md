@@ -48,7 +48,7 @@
 - [x] Import: Markdown (`@flexova/import`) and Word (mammoth, offline; Word callout styles map to callouts).
 - [x] Save: the File System Access API, or a download; drafts are kept on the device and offered back. Export: a static web page (`.flexova.html`), and print or PDF.
 - [x] Tests: 33 unit, 39 browser tests in Chromium, and axe with no violations on the editor and its dialogs.
-- [ ] Firefox and WebKit green in CI
+- [x] CI green on Chromium, Firefox and WebKit, and Lighthouse accessibility ≥ 95
 - [ ] Owner: try the editor on a real document from your field, on desktop and on a phone
 
 ### M6: Pilot release
