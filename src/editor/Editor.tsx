@@ -242,14 +242,13 @@ export function Editor({ session, onClose, onPrint, announce }: Props) {
   };
   // After a dialog's action (insert, apply), focus goes back to the text instead of the toolbar button.
   const focusText = useRef(false);
-  const keepFocusInDialogOpener = useCallback(() => !focusText.current, []);
-  const closeDialog = useCallback(() => {
-    setDialog(null);
-    if (focusText.current) {
-      focusText.current = false;
-      view.current?.focus();
-    }
+  const keepFocusInDialogOpener = useCallback(() => {
+    if (!focusText.current) return true;
+    focusText.current = false;
+    view.current?.focus();
+    return false;
   }, []);
+  const closeDialog = useCallback(() => setDialog(null), []);
   const finishDialog = () => {
     focusText.current = true;
     setDialog(null);

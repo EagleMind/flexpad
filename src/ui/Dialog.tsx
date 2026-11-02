@@ -1,5 +1,5 @@
 // A modal dialog on the native <dialog> element: focus moves in, Escape closes, focus returns on close.
-import { useEffect, useId, useRef, type ReactNode } from "react";
+import { useEffect, useId, useLayoutEffect, useRef, type ReactNode } from "react";
 import { t } from "../strings";
 import { CloseIcon } from "./icons";
 
@@ -9,7 +9,10 @@ interface Props {
   onClose: () => void;
   children: ReactNode;
   className?: string;
-  /** Whether closing returns focus to what opened the dialog (default yes). */
+  /**
+   * Called once, right after the dialog closes. Return true to return focus to what opened the dialog
+   * (the default), or false after moving focus somewhere else yourself.
+   */
   restoreFocus?: () => boolean;
 }
 
@@ -17,15 +20,30 @@ export function Dialog({ open, title, onClose, children, className, restoreFocus
   const ref = useRef<HTMLDialogElement>(null);
   const titleId = useId();
   const returnTo = useRef<Element | null>(null);
-
+  // Each close() fires one "close" event later; these are the ones the owner caused.
+  const ownerCloses = useRef(0);
+  const restoreRef = useRef(restoreFocus);
   useEffect(() => {
+    restoreRef.current = restoreFocus;
+  }, [restoreFocus]);
+
+  // Focus settles in the same task that closes the dialog. The "close" event comes a task later, and
+  // keys typed in between would otherwise go to the button that opened it (a space would reopen it).
+  const settleFocus = () => {
+    const restore = restoreRef.current?.() ?? true;
+    if (restore && returnTo.current instanceof HTMLElement) returnTo.current.focus();
+  };
+
+  useLayoutEffect(() => {
     const dialog = ref.current;
     if (!dialog) return;
     if (open && !dialog.open) {
       returnTo.current = document.activeElement;
       dialog.showModal();
     } else if (!open && dialog.open) {
+      ownerCloses.current++;
       dialog.close();
+      settleFocus();
     }
   }, [open]);
 
@@ -33,13 +51,17 @@ export function Dialog({ open, title, onClose, children, className, restoreFocus
     const dialog = ref.current;
     if (!dialog) return;
     const onDialogClose = () => {
-      const restore = restoreFocus?.() ?? true;
+      // Closed by the owner (open became false): focus was already settled above.
+      if (ownerCloses.current > 0) {
+        ownerCloses.current--;
+        return;
+      }
       onClose();
-      if (restore && returnTo.current instanceof HTMLElement) returnTo.current.focus();
+      settleFocus();
     };
     dialog.addEventListener("close", onDialogClose);
     return () => dialog.removeEventListener("close", onDialogClose);
-  }, [onClose, restoreFocus]);
+  }, [onClose]);
 
   return (
     <dialog

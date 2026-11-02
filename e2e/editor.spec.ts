@@ -142,7 +142,16 @@ test("links text to a web address and to a heading", async ({ page }) => {
   await dialog.getByRole("button", { name: "Apply" }).click();
   await expect(dialog.getByRole("alert")).toBeVisible();
   await dialog.getByLabel(/Web address/).fill("example.org");
-  await dialog.getByRole("button", { name: "Apply" }).click();
+  // Focus is back in the text as soon as Apply has run, before the dialog's "close" event (a task
+  // later): keys typed in between must not reach the Link button, where a space would reopen the dialog.
+  const focusedInText = await dialog
+    .getByRole("button", { name: "Apply" })
+    .evaluate(async (apply) => {
+      (apply as HTMLButtonElement).click();
+      for (let i = 0; i < 5; i++) await Promise.resolve();
+      return !!document.activeElement?.closest(".editor-surface");
+    });
+  expect(focusedInText).toBe(true);
   await page.keyboard.press("End");
   await page.keyboard.type(" Back to top");
   for (let i = 0; i < 11; i++) await page.keyboard.press("Shift+ArrowLeft");
