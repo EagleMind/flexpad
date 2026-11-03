@@ -1,0 +1,5 @@
+# The @flexova packages are vendored tarballs until 0.1.0 is on npm (ADR-0004). The html and import
+# tarballs depend on @flexova/core and @flexova/viewer by version; point those at the tarballs too.
+overrides:
+  "@flexova/core": "file:vendor/flexova-core-0.0.0.tgz"
+  "@flexova/viewer": "file:vendor/flexova-viewer-0.0.0.tgz"

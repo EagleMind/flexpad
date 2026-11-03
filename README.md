@@ -1,11 +1,17 @@
 # FlexPad
 
-The offline-first reader for [Flexova](https://github.com/EagleMind/flexova) (`.flexova`) documents: a web app you can install on phones, tablets and desktops.
+The offline-first reader and editor for [Flexova](https://github.com/EagleMind/flexova) (`.flexova`) documents: a web app you can install on phones, tablets and desktops.
 
 - Open documents from the file picker, by drag and drop, from the operating system (desktop Chromium), or by same-origin link (`?src=`).
 - Read with a table of contents, full-text search, adjustable text size, light and dark themes, and printing.
 - Reopen recent documents offline, at the place you left off.
 - See who signed a document, verified against publisher keys you trust.
+- **Write and edit documents:**
+  - headings, lists, tables, callouts, figures with required alt text, links and collapsible sections;
+  - checked theme colors;
+  - import from Markdown or Word, save as `.flexova`, export a static web page or PDF.
+
+  Everything you save is a valid Flexova document.
 
 ## License
 

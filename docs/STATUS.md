@@ -1,7 +1,7 @@
 # Status
 
-**Current milestone:** M4, FlexPad web reader (in review, branch `m4-reader`)
-**Next task:** M5.1, the editor (Tiptap with a schema generated from the Flexova profile)
+**Current milestone:** M5, editor (in review, branch `m5-editor`, stacked on `m4-reader`)
+**Next task:** M6, the pilot release (production deployment, docs site, pilot feedback)
 
 ## Owner actions
 
@@ -39,9 +39,17 @@
 - [ ] Known flake: in Firefox, one test per run can time out on its first page load and pass on retry (CI retries once). The cause isn't identified yet; the Playwright trace is in the run's `playwright-report-firefox` artifact.
 - [ ] Real-device check (owner)
 
-### M5: Editor (L)
+### M5: Editor (L) · in review
 
-Tiptap/ProseMirror with a schema generated from `profile-1.0.json`, images (WebP), theme editor with contrast checks, DOCX import (mammoth.js), save to `.flexova`, export `.flexova.html` and PDF.
+- [x] Editor on ProseMirror, with a schema generated from the Flexova profile (ADR-0008). It covers headings, paragraphs, lists, quotes, callouts, code, tables (with header and footer rows, and merged cells), figures, links, collapsible sections, chapters, and every profile mark.
+- [x] Saving always produces a valid package. Round trips keep content: all 13 conformance packages and both samples. Randomized edits always save valid packages: 200 sequences in CI, 2,000 checked locally.
+- [x] Images: re-encoded in the browser (WebP, else JPEG or PNG; at most 1,600 px), with required alt text or an explicit "decorative" choice.
+- [x] Theme colors are checked live against the 4.5:1 contrast rule; title, language and authors are editable.
+- [x] Import: Markdown (`@flexova/import`) and Word (mammoth, offline; Word callout styles map to callouts).
+- [x] Save: the File System Access API, or a download; drafts are kept on the device and offered back. Export: a static web page (`.flexova.html`), and print or PDF.
+- [x] Tests: 33 unit, 39 browser tests in Chromium, and axe with no violations on the editor and its dialogs.
+- [x] CI green on Chromium, Firefox and WebKit, and Lighthouse accessibility ≥ 95
+- [ ] Owner: try the editor on a real document from your field, on desktop and on a phone
 
 ### M6: Pilot release
 

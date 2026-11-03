@@ -6,6 +6,7 @@ import { stepScale, type Settings, type Theme } from "../settings/settings";
 import { t } from "../strings";
 import {
   BackIcon,
+  EditIcon,
   InfoIcon,
   LargerIcon,
   ListIcon,
@@ -27,13 +28,22 @@ interface Props {
   onSettings: (s: Settings) => void;
   onClose: () => void;
   onOpenSettings: () => void;
+  onEdit: () => void;
   announce: (message: string) => void;
 }
 
 type Panel = "toc" | "search" | "info" | null;
 const NEXT_THEME: Record<Theme, Theme> = { auto: "light", light: "dark", dark: "auto" };
 
-export function Reader({ doc, settings, onSettings, onClose, onOpenSettings, announce }: Props) {
+export function Reader({
+  doc,
+  settings,
+  onSettings,
+  onClose,
+  onOpenSettings,
+  onEdit,
+  announce,
+}: Props) {
   const viewer = useRef<ViewerElement>(null);
   const toolbar = useRef<HTMLElement>(null);
   const [toc, setToc] = useState<TocEntry[]>([]);
@@ -220,6 +230,10 @@ export function Reader({ doc, settings, onSettings, onClose, onOpenSettings, ann
             }}
           >
             <InfoIcon />
+          </button>
+          <button type="button" className="tool" onClick={onEdit}>
+            <EditIcon />
+            <span className="tool-label">{t.editor.edit}</span>
           </button>
           <button
             type="button"

@@ -9,3 +9,4 @@
 | [0005](ADR-0005-pwa-and-hosting.md)     | PWA with an update prompt; Cloudflare Pages; installability checked through Chromium                                                    |
 | [0006](ADR-0006-public-agpl.md)         | The repository is public and the code is AGPL-3.0-only; Settings offers the source; no outside PRs until a contributor agreement exists |
 | [0007](ADR-0007-cloudflare-workers.md)  | Hosting on Cloudflare Workers static assets (supersedes ADR-0005's Pages hosting)                                                       |
+| [0008](ADR-0008-editor.md)              | The editor: ProseMirror with a profile-generated schema, normalizing saves, mammoth for Word, canvas image encoding (no WASM), drafts   |
