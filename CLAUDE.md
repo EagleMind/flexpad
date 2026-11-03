@@ -19,6 +19,7 @@ FlexPad is the open-source (AGPL-3.0-only), offline-first reader (M4) and later 
 | Update the vendored @flexova packages | `pnpm vendor [path-to-flexova]`                                                    |
 | Rebuild sample and test documents     | `node scripts/fixtures.mjs [path-to-flexova]` (after `pnpm build` in flexova)      |
 | Re-render icons                       | `pnpm icons`                                                                       |
+| Check the Cloudflare deploy           | `pnpm deploy:check` (builds, then `wrangler deploy --dry-run`; no credentials)     |
 
 ## Layout
 
@@ -26,7 +27,7 @@ FlexPad is the open-source (AGPL-3.0-only), offline-first reader (M4) and later 
 - `src/reader/`: the reader, its dialogs, search (`search.ts`), reading position (`position.ts`), rendered blocks (`blocks.ts`).
 - `src/library/`: the home screen and the library store (IndexedDB). `src/settings/`: preferences and trusted keys.
 - `src/strings.ts`: every user-facing string. `src/styles.css`: the only stylesheet.
-- `public/_headers`: CSP and security headers for Cloudflare Pages; `e2e/serve.mjs` applies the same rules in tests.
+- `public/_headers`: CSP and security headers; `wrangler.jsonc` deploys `dist/` as Cloudflare Workers static assets (ADR-0007); `e2e/serve.mjs` applies the same headers in tests.
 - `vendor/`: `@flexova/core` and `@flexova/viewer` tarballs, until 0.1.0 is on npm (FlexPad ADR-0004).
 - `e2e/`: Playwright specs and fixtures.
 

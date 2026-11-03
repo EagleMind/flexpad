@@ -1,0 +1,12 @@
+// Cloudflare Workers: FlexPad is served as static assets only (no server code). The build writes dist/,
+// including _headers (CSP and security headers), which Workers apply to every asset. Unknown paths serve
+// index.html, so the app's own routes and the service worker's navigation fallback work.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "flexpad",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "single-page-application",
+  },
+}

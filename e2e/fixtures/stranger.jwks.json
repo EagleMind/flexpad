@@ -1,0 +1,12 @@
+{
+  "keys": [
+    {
+      "kty": "OKP",
+      "crv": "Ed25519",
+      "x": "iwLwlwH1GNKoc5YBdmNNTuFN6a0_3KRoOYQTE-3ObEw",
+      "kid": "aurora-publisher",
+      "use": "sig",
+      "alg": "Ed25519"
+    }
+  ]
+}
